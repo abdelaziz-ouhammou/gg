@@ -2,6 +2,7 @@
 package gg
 
 import (
+	"embed"
 	"errors"
 	"image"
 	"image/color"
@@ -696,6 +697,14 @@ func (dc *Context) SetFontFace(fontFace font.Face) {
 
 func (dc *Context) LoadFontFace(path string, points float64) error {
 	face, err := LoadFontFace(path, points)
+	if err == nil {
+		dc.fontFace = face
+		dc.fontHeight = points * 72 / 96
+	}
+	return err
+}
+func (dc *Context) LoadFontFaceFS(fs embed.FS, path string, points float64) error {
+	face, err := LoadFontFaceFS(fs, path, points)
 	if err == nil {
 		dc.fontFace = face
 		dc.fontHeight = points * 72 / 96

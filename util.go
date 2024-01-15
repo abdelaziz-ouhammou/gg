@@ -1,6 +1,7 @@
 package gg
 
 import (
+	"embed"
 	"fmt"
 	"image"
 	"image/draw"
@@ -131,6 +132,21 @@ func unfix(x fixed.Int26_6) float64 {
 // this package-level function.
 func LoadFontFace(path string, points float64) (font.Face, error) {
 	fontBytes, err := ioutil.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	f, err := truetype.Parse(fontBytes)
+	if err != nil {
+		return nil, err
+	}
+	face := truetype.NewFace(f, &truetype.Options{
+		Size: points,
+		// Hinting: font.HintingFull,
+	})
+	return face, nil
+}
+func LoadFontFaceFS(fs embed.FS, path string, points float64) (font.Face, error) {
+	fontBytes, err := fs.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
