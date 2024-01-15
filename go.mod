@@ -1,4 +1,4 @@
-module github.com/Abdelaziz-Ouhammou/gg
+module github.com/abdelaziz-ouhammou/gg
 
 go 1.21.5
 
