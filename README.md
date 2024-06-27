@@ -1,6 +1,6 @@
 # Go Graphics
 
-`gg` is a library for rendering 2D graphics in pure Go.
+`gg` is a library for rendering 2D graphics in pure Go. This is a fork since the original doesn't look to be maintained anymore.
 
 ![Stars](http://i.imgur.com/CylQIJt.png)
 

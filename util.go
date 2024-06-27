@@ -1,14 +1,13 @@
 package gg
 
 import (
-	"embed"
 	"fmt"
 	"image"
 	"image/draw"
 	"image/jpeg"
 	_ "image/jpeg"
 	"image/png"
-	"io/ioutil"
+	"io/fs"
 	"math"
 	"os"
 	"strings"
@@ -36,9 +35,26 @@ func LoadImage(path string) (image.Image, error) {
 	im, _, err := image.Decode(file)
 	return im, err
 }
+func LoadImageFS(fsys fs.FS, path string) (image.Image, error) {
+	file, err := fsys.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	im, _, err := image.Decode(file)
+	return im, err
+}
 
 func LoadPNG(path string) (image.Image, error) {
 	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	return png.Decode(file)
+}
+func LoadPNGFS(fsys fs.FS, path string) (image.Image, error) {
+	file, err := fsys.Open(path)
 	if err != nil {
 		return nil, err
 	}
@@ -57,6 +73,15 @@ func SavePNG(path string, im image.Image) error {
 
 func LoadJPG(path string) (image.Image, error) {
 	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	return jpeg.Decode(file)
+}
+
+func LoadJPGFS(fsys fs.FS, path string) (image.Image, error) {
+	file, err := fsys.Open(path)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +131,7 @@ func parseHexColor(x string) (r, g, b, a int) {
 }
 
 func fixp(x, y float64) fixed.Point26_6 {
-	return fixed.Point26_6{fix(x), fix(y)}
+	return fixed.Point26_6{X: fix(x), Y: fix(y)}
 }
 
 func fix(x float64) fixed.Int26_6 {
@@ -131,7 +156,7 @@ func unfix(x fixed.Int26_6) float64 {
 // You can usually just use the Context.LoadFontFace function instead of
 // this package-level function.
 func LoadFontFace(path string, points float64) (font.Face, error) {
-	fontBytes, err := ioutil.ReadFile(path)
+	fontBytes, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
@@ -145,8 +170,8 @@ func LoadFontFace(path string, points float64) (font.Face, error) {
 	})
 	return face, nil
 }
-func LoadFontFaceFS(fs embed.FS, path string, points float64) (font.Face, error) {
-	fontBytes, err := fs.ReadFile(path)
+func LoadFontFaceFS(fsys fs.FS, path string, points float64) (font.Face, error) {
+	fontBytes, err := fs.ReadFile(fsys, path)
 	if err != nil {
 		return nil, err
 	}
